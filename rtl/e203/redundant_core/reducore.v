@@ -10,7 +10,7 @@
 
 `include "e203_defines.v"
 
-module e203_core(
+module redundant_core(
   output[`E203_PC_SIZE-1:0] inspect_pc,
 
   `ifdef E203_HAS_CSR_EAI//{
