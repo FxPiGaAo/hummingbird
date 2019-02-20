@@ -104,9 +104,59 @@ module ifu_buffer(
   //input  dec2ifu_divu  ,
   //input  dec2ifu_remu  ,
 
-  input clk
-  //input  clk,
+  input  clk,
   //input  rst_n
+  
+  
+  input[`E203_PC_SIZE-1:0] in_inspect_pc,
+  input in_ifu_active,
+
+  `ifdef E203_HAS_ITCM //{
+
+
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  // Bus Interface to ITCM, internal protocol called ICB (Internal Chip Bus)
+  //    * Bus cmd channel
+  input in_ifu2itcm_icb_cmd_valid, // Handshake valid
+  input [`E203_ITCM_ADDR_WIDTH-1:0]   in_ifu2itcm_icb_cmd_addr, // Bus transaction start addr 
+
+  //    * Bus RSP channel
+  input in_ifu2itcm_icb_rsp_ready, // Response ready
+  `endif//}
+
+  `ifdef E203_HAS_MEM_ITF //{
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  // Bus Interface to System Memory, internal protocol called ICB (Internal Chip Bus)
+  //    * Bus cmd channel
+  input in_ifu2biu_icb_cmd_valid, // Handshake valid
+  input [`E203_ADDR_SIZE-1:0]   in_ifu2biu_icb_cmd_addr, // Bus transaction start addr 
+
+  //    * Bus RSP channel
+  input in_ifu2biu_icb_rsp_ready, // Response ready
+
+  `endif//}
+
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  // The IR stage to EXU interface
+  input [`E203_INSTR_SIZE-1:0] in_ifu_o_ir,// The instruction register
+  input [`E203_PC_SIZE-1:0] in_ifu_o_pc,   // The PC register along with
+  input in_ifu_o_pc_vld,
+  input in_ifu_o_misalgn,                  // The fetch misalign 
+  input in_ifu_o_buserr,                   // The fetch bus error
+  input [`E203_RFIDX_WIDTH-1:0] in_ifu_o_rs1idx,
+  input [`E203_RFIDX_WIDTH-1:0] in_ifu_o_rs2idx,
+  input in_ifu_o_prdt_taken,               // The Bxx is predicted as taken
+  input in_ifu_o_muldiv_b2b,               
+  input in_ifu_o_valid, // Handshake signals with EXU stage
+
+  input  in_pipe_flush_ack,
+  `ifdef E203_TIMING_BOOST//}
+  `endif//}
+
+  input in_ifu_halt_ack
   );
   
 endmodule
