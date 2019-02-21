@@ -110,21 +110,23 @@ module redundant_exu_alu(
   //////////////////////////////////////////////////////////////
   // The AGU ICB Interface to LSU-ctrl
   //    * Bus cmd channel
-  output                         agu_icb_cmd_valid, // Handshake valid
+  //  Since we don't need LSU in the redundant
+  //  exu unit, so we don't need the output for LSU
+  // output                         agu_icb_cmd_valid, // Handshake valid
   input                          agu_icb_cmd_ready, // Handshake ready
-  output [`E203_ADDR_SIZE-1:0]   agu_icb_cmd_addr, // Bus transaction start addr 
-  output                         agu_icb_cmd_read,   // Read or write
-  output [`E203_XLEN-1:0]        agu_icb_cmd_wdata, 
-  output [`E203_XLEN/8-1:0]      agu_icb_cmd_wmask, 
-  output                         agu_icb_cmd_lock,
-  output                         agu_icb_cmd_excl,
-  output [1:0]                   agu_icb_cmd_size,
-  output                         agu_icb_cmd_back2agu, 
-  output                         agu_icb_cmd_usign,
-  output [`E203_ITAG_WIDTH -1:0] agu_icb_cmd_itag,
+  // output [`E203_ADDR_SIZE-1:0]   agu_icb_cmd_addr, // Bus transaction start addr 
+  // output                         agu_icb_cmd_read,   // Read or write
+  // output [`E203_XLEN-1:0]        agu_icb_cmd_wdata, 
+  // output [`E203_XLEN/8-1:0]      agu_icb_cmd_wmask, 
+  // output                         agu_icb_cmd_lock,
+  // output                         agu_icb_cmd_excl,
+  // output [1:0]                   agu_icb_cmd_size,
+  // output                         agu_icb_cmd_back2agu, 
+  // output                         agu_icb_cmd_usign,
+  // output [`E203_ITAG_WIDTH -1:0] agu_icb_cmd_itag,
   //    * Bus RSP channel
   input                          agu_icb_rsp_valid, // Response valid 
-  output                         agu_icb_rsp_ready, // Response ready
+  // output                         agu_icb_rsp_ready, // Response ready
   input                          agu_icb_rsp_err  , // Response error
   input                          agu_icb_rsp_excl_ok,
   input  [`E203_XLEN-1:0]        agu_icb_rsp_rdata,
@@ -392,20 +394,32 @@ module redundant_exu_alu(
       .agu_o_cmt_buserr    (agu_o_cmt_buserr    ),
       .agu_o_cmt_badaddr   (agu_o_cmt_badaddr   ),
                                                 
-      .agu_icb_cmd_valid   (agu_icb_cmd_valid   ),
+      //.agu_icb_cmd_valid   (agu_icb_cmd_valid   ),
+      .agu_icb_cmd_valid   (),
       .agu_icb_cmd_ready   (agu_icb_cmd_ready   ),
-      .agu_icb_cmd_addr    (agu_icb_cmd_addr    ),
-      .agu_icb_cmd_read    (agu_icb_cmd_read    ),
-      .agu_icb_cmd_wdata   (agu_icb_cmd_wdata   ),
-      .agu_icb_cmd_wmask   (agu_icb_cmd_wmask   ),
-      .agu_icb_cmd_lock    (agu_icb_cmd_lock    ),
-      .agu_icb_cmd_excl    (agu_icb_cmd_excl    ),
-      .agu_icb_cmd_size    (agu_icb_cmd_size    ),
-      .agu_icb_cmd_back2agu(agu_icb_cmd_back2agu),
-      .agu_icb_cmd_usign   (agu_icb_cmd_usign   ),
-      .agu_icb_cmd_itag    (agu_icb_cmd_itag    ),
+      //.agu_icb_cmd_addr    (agu_icb_cmd_addr    ),
+      .agu_icb_cmd_addr    (),
+      //.agu_icb_cmd_read    (agu_icb_cmd_read    ),
+      .agu_icb_cmd_read    (),
+      //.agu_icb_cmd_wdata   (agu_icb_cmd_wdata   ),
+      .agu_icb_cmd_wdata   (),
+      //.agu_icb_cmd_wmask   (agu_icb_cmd_wmask   ),
+      .agu_icb_cmd_wmask   (),
+      //.agu_icb_cmd_lock    (agu_icb_cmd_lock    ),
+      .agu_icb_cmd_lock    (),
+      //.agu_icb_cmd_excl    (agu_icb_cmd_excl    ),
+      .agu_icb_cmd_excl    (),
+      //.agu_icb_cmd_size    (agu_icb_cmd_size    ),
+      .agu_icb_cmd_size    (),
+      //.agu_icb_cmd_back2agu(agu_icb_cmd_back2agu),
+      .agu_icb_cmd_back2agu    (),
+      //.agu_icb_cmd_usign   (agu_icb_cmd_usign   ),
+      .agu_icb_cmd_usign   (),
+      //.agu_icb_cmd_itag    (agu_icb_cmd_itag    ),
+      .agu_icb_cmd_itag    (),
       .agu_icb_rsp_valid   (agu_icb_rsp_valid   ),
-      .agu_icb_rsp_ready   (agu_icb_rsp_ready   ),
+      //.agu_icb_rsp_ready   (agu_icb_rsp_ready   ),
+      .agu_icb_rsp_ready   (),
       .agu_icb_rsp_err     (agu_icb_rsp_err     ),
       .agu_icb_rsp_excl_ok (agu_icb_rsp_excl_ok ),
       .agu_icb_rsp_rdata   (agu_icb_rsp_rdata   ),

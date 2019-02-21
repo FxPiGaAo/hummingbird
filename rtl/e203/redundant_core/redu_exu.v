@@ -475,7 +475,7 @@ module redundant_exu(
   wire mdv_nob2b;
 
 
-  e203_exu_alu u_e203_exu_alu(
+  redundant_exu_alu u_redundant_exu_alu(
 
 
   `ifdef E203_HAS_CSR_EAI//{
