@@ -25,11 +25,11 @@ module redundant_exu_alu(
   `ifndef E203_HAS_EAI
   input  eai_xs_off,
   `endif//
-  output         eai_csr_valid,
+  //output         eai_csr_valid,
   input          eai_csr_ready,
-  output  [31:0] eai_csr_addr,
-  output         eai_csr_wr,
-  output  [31:0] eai_csr_wdata,
+  //output  [31:0] eai_csr_addr,
+  //output         eai_csr_wr,
+  //output  [31:0] eai_csr_wdata,
   input   [31:0] eai_csr_rdata,
   `endif//}
 
@@ -222,11 +222,15 @@ module redundant_exu_alu(
   `ifdef E203_HAS_CSR_EAI//{
     .csr_sel_eai      (csr_sel_eai),
     .eai_xs_off       (eai_xs_off),
-    .eai_csr_valid    (eai_csr_valid),
+    //.eai_csr_valid    (eai_csr_valid),
+    .eai_csr_valid    (),
     .eai_csr_ready    (eai_csr_ready),
-    .eai_csr_addr     (eai_csr_addr ),
-    .eai_csr_wr       (eai_csr_wr ),
-    .eai_csr_wdata    (eai_csr_wdata),
+    //.eai_csr_addr     (eai_csr_addr ),
+    .eai_csr_addr     (),
+    //.eai_csr_wr       (eai_csr_wr ),
+    .eai_csr_wr       (),
+    //.eai_csr_wdata    (eai_csr_wdata),
+    .eai_csr_wdata    (),
     .eai_csr_rdata    (eai_csr_rdata),
   `endif//}
     .csr_access_ilgl  (csr_access_ilgl),

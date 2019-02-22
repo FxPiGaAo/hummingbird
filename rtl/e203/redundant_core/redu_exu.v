@@ -9,16 +9,16 @@
 `include "e203_defines.v"
 
 module redundant_exu(
-  output commit_mret,
-  output commit_trap,
-  output exu_active,
-  output excp_active,
+//  output commit_mret,
+//  output commit_trap,
+//  output exu_active,
+//  output excp_active,
 
-  output core_wfi,
-  output tm_stop,
-  output itcm_nohold,
-  output core_cgstop,
-  output tcm_cgstop,
+//  output core_wfi,
+//  output tm_stop,
+//  output itcm_nohold,
+//  output core_cgstop,
+//  output tcm_cgstop,
 
   input  [`E203_HART_ID_W-1:0] core_mhartid,
   input  dbg_irq_r,
@@ -28,20 +28,20 @@ module redundant_exu(
   input  sft_irq_r,
   input  tmr_irq_r,
 
-  //////////////////////////////////////////////////////////////
-  // From/To debug ctrl module
-  output  [`E203_PC_SIZE-1:0] cmt_dpc,
-  output  cmt_dpc_ena,
-  output  [3-1:0] cmt_dcause,
-  output  cmt_dcause_ena,
+//  //////////////////////////////////////////////////////////////
+//  // From/To debug ctrl module
+//  output  [`E203_PC_SIZE-1:0] cmt_dpc,
+//  output  cmt_dpc_ena,
+//  output  [3-1:0] cmt_dcause,
+//  output  cmt_dcause_ena,
 
-  output wr_dcsr_ena    ,
-  output wr_dpc_ena     ,
-  output wr_dscratch_ena,
+//  output wr_dcsr_ena    ,
+//  output wr_dpc_ena     ,
+//  output wr_dscratch_ena,
 
 
 
-  output [`E203_XLEN-1:0] wr_csr_nxt    ,
+  //output [`E203_XLEN-1:0] wr_csr_nxt    ,
 
   input [`E203_XLEN-1:0] dcsr_r    ,
   input [`E203_PC_SIZE-1:0] dpc_r     ,
@@ -58,7 +58,7 @@ module redundant_exu(
   //////////////////////////////////////////////////////////////
   // The IFU IR stage to EXU interface
   input  i_valid, // Handshake signals with EXU stage
-  output i_ready,
+  //output i_ready,
   input  [`E203_INSTR_SIZE-1:0] i_ir,// The instruction register
   input  [`E203_PC_SIZE-1:0] i_pc,   // The PC register along with
   input  i_pc_vld,
@@ -80,18 +80,18 @@ module redundant_exu(
   //     and IFU will just use its adder to caculate the flush-pc-adder-result
   //
   input   pipe_flush_ack,
-  output  pipe_flush_req,
-  output  [`E203_PC_SIZE-1:0] pipe_flush_add_op1,  
-  output  [`E203_PC_SIZE-1:0] pipe_flush_add_op2,  
-  `ifdef E203_TIMING_BOOST//}
-  output  [`E203_PC_SIZE-1:0] pipe_flush_pc,  
-  `endif//}
+//  output  pipe_flush_req,
+//  output  [`E203_PC_SIZE-1:0] pipe_flush_add_op1,  
+//  output  [`E203_PC_SIZE-1:0] pipe_flush_add_op2,  
+//  `ifdef E203_TIMING_BOOST//}
+//  output  [`E203_PC_SIZE-1:0] pipe_flush_pc,  
+//  `endif//}
 
   //////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////
   // The LSU Write-Back Interface
   input  lsu_o_valid, // Handshake valid
-  output lsu_o_ready, // Handshake ready
+  //output lsu_o_ready, // Handshake ready
   input  [`E203_XLEN-1:0] lsu_o_wbck_wdat,
   input  [`E203_ITAG_WIDTH -1:0] lsu_o_wbck_itag,
   input  lsu_o_wbck_err , 
@@ -100,57 +100,57 @@ module redundant_exu(
   input  [`E203_ADDR_SIZE -1:0] lsu_o_cmt_badaddr,
   input  lsu_o_cmt_buserr , // The bus-error exception generated
 
-  output wfi_halt_ifu_req,
+  //output wfi_halt_ifu_req,
   input  wfi_halt_ifu_ack,
 
-  output oitf_empty,
-  output [`E203_XLEN-1:0] rf2ifu_x1,
-  output [`E203_XLEN-1:0] rf2ifu_rs1,
-  output dec2ifu_rden,
-  output dec2ifu_rs1en,
-  output [`E203_RFIDX_WIDTH-1:0] dec2ifu_rdidx,
-  output dec2ifu_mulhsu,
-  output dec2ifu_div   ,
-  output dec2ifu_rem   ,
-  output dec2ifu_divu  ,
-  output dec2ifu_remu  ,
+//  output oitf_empty,
+//  output [`E203_XLEN-1:0] rf2ifu_x1,
+//  output [`E203_XLEN-1:0] rf2ifu_rs1,
+//  output dec2ifu_rden,
+//  output dec2ifu_rs1en,
+//  output [`E203_RFIDX_WIDTH-1:0] dec2ifu_rdidx,
+//  output dec2ifu_mulhsu,
+//  output dec2ifu_div   ,
+//  output dec2ifu_rem   ,
+//  output dec2ifu_divu  ,
+//  output dec2ifu_remu  ,
 
   //////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////
   // The AGU ICB Interface to LSU-ctrl
   //    * Bus cmd channel
-  output                         agu_icb_cmd_valid, // Handshake valid
+  //output                         agu_icb_cmd_valid, // Handshake valid
   input                          agu_icb_cmd_ready, // Handshake ready
-  output [`E203_ADDR_SIZE-1:0]   agu_icb_cmd_addr, // Bus transaction start addr 
-  output                         agu_icb_cmd_read,   // Read or write
-  output [`E203_XLEN-1:0]        agu_icb_cmd_wdata, 
-  output [`E203_XLEN/8-1:0]      agu_icb_cmd_wmask, 
-  output                         agu_icb_cmd_lock,
-  output                         agu_icb_cmd_excl,
-  output [1:0]                   agu_icb_cmd_size,
+  //output [`E203_ADDR_SIZE-1:0]   agu_icb_cmd_addr, // Bus transaction start addr 
+  //output                         agu_icb_cmd_read,   // Read or write
+  //output [`E203_XLEN-1:0]        agu_icb_cmd_wdata, 
+  //output [`E203_XLEN/8-1:0]      agu_icb_cmd_wmask, 
+  //output                         agu_icb_cmd_lock,
+  //output                         agu_icb_cmd_excl,
+  //output [1:0]                   agu_icb_cmd_size,
            // Several additional side channel signals
            //   Indicate LSU-ctrl module to
            //     return the ICB response channel back to AGU
            //     this is only used by AMO or unaligned load/store 1st uop
            //     to return the response
-  output                         agu_icb_cmd_back2agu, 
+  //output                         agu_icb_cmd_back2agu, 
            //   Sign extension or not
-  output                         agu_icb_cmd_usign,
-  output [`E203_ITAG_WIDTH -1:0] agu_icb_cmd_itag,
+  //output                         agu_icb_cmd_usign,
+  //output [`E203_ITAG_WIDTH -1:0] agu_icb_cmd_itag,
 
   //    * Bus RSP channel
   input                          agu_icb_rsp_valid, // Response valid 
-  output                         agu_icb_rsp_ready, // Response ready
+  //output                         agu_icb_rsp_ready, // Response ready
   input                          agu_icb_rsp_err  , // Response error
   input                          agu_icb_rsp_excl_ok,
   input  [`E203_XLEN-1:0]        agu_icb_rsp_rdata,
 
   `ifdef E203_HAS_CSR_EAI//{
-  output         eai_csr_valid,
+  //output         eai_csr_valid,
   input          eai_csr_ready,
-  output  [31:0] eai_csr_addr,
-  output         eai_csr_wr,
-  output  [31:0] eai_csr_wdata,
+  //output  [31:0] eai_csr_addr,
+  //output         eai_csr_wr,
+  //output  [31:0] eai_csr_wdata,
   input   [31:0] eai_csr_rdata,
   `endif//}
 
@@ -180,7 +180,8 @@ module redundant_exu(
     .read_src1_dat (rf_rs1),
     .read_src2_dat (rf_rs2),
     
-    .x1_r          (rf2ifu_x1),
+    //.x1_r          (rf2ifu_x1),
+    .x1_r          (),
                     
     .wbck_dest_wen (rf_wbck_ena),
     .wbck_dest_idx (rf_wbck_rdidx),
@@ -230,12 +231,17 @@ module redundant_exu(
     .dec_jalr_rs1idx(),
     .dec_bjp_imm(),
 
-    .dec_mulhsu  (dec2ifu_mulhsu),
+    //.dec_mulhsu  (dec2ifu_mulhsu),
+    .dec_mulhsu  (),
     .dec_mul     (),
-    .dec_div     (dec2ifu_div   ),
-    .dec_rem     (dec2ifu_rem   ),
-    .dec_divu    (dec2ifu_divu  ),
-    .dec_remu    (dec2ifu_remu  ),
+    //.dec_div     (dec2ifu_div   ),
+    .dec_div     (),
+    //.dec_rem     (dec2ifu_rem   ),
+    .dec_rem     (),
+    //.dec_divu    (dec2ifu_divu  ),
+    .dec_divu    (),
+    //.dec_remu    (dec2ifu_remu  ),
+    .dec_remu    (),
 
     
 
@@ -305,12 +311,14 @@ module redundant_exu(
   e203_exu_disp u_e203_exu_disp(
     .wfi_halt_exu_req    (wfi_halt_exu_req),
     .wfi_halt_exu_ack    (wfi_halt_exu_ack),
-    .oitf_empty          (oitf_empty),
+    //.oitf_empty          (oitf_empty),
+    .oitf_empty          (),
 
     .amo_wait            (amo_wait),
 
     .disp_i_valid        (i_valid         ),
-    .disp_i_ready        (i_ready         ),
+    //.disp_i_ready        (i_ready         ),
+    .disp_i_ready        (),
                                        
     .disp_i_rs1x0        (dec_rs1x0       ),
     .disp_i_rs2x0        (dec_rs2x0       ),
@@ -415,7 +423,8 @@ module redundant_exu(
     .oitfrd_match_disprs3 (oitfrd_match_disprs3),
     .oitfrd_match_disprd  (oitfrd_match_disprd ),
 
-    .oitf_empty           (oitf_empty    ),
+    //.oitf_empty           (oitf_empty    ),
+    .oitf_empty           (),
 
     .clk                  (clk           ),
     .rst_n                (rst_n         ) 
@@ -479,11 +488,15 @@ module redundant_exu(
 
 
   `ifdef E203_HAS_CSR_EAI//{
-    .eai_csr_valid (eai_csr_valid),
-    .eai_csr_ready (eai_csr_ready),
-    .eai_csr_addr  (eai_csr_addr ),
-    .eai_csr_wr    (eai_csr_wr   ),
-    .eai_csr_wdata (eai_csr_wdata),
+    //.eai_csr_valid    (eai_csr_valid),
+    .eai_csr_valid    (),
+    .eai_csr_ready    (eai_csr_ready),
+    //.eai_csr_addr     (eai_csr_addr ),
+    .eai_csr_addr     (),
+    //.eai_csr_wr       (eai_csr_wr ),
+    .eai_csr_wr       (),
+    //.eai_csr_wdata    (eai_csr_wdata),
+    .eai_csr_wdata    (),
     .eai_csr_rdata (eai_csr_rdata),
   `endif//}
     .csr_access_ilgl     (csr_access_ilgl),
@@ -510,7 +523,8 @@ module redundant_exu(
     .flush_pulse         (flush_pulse    ),
     .flush_req           (flush_req      ),
 
-    .oitf_empty          (oitf_empty),
+    //.oitf_empty          (oitf_empty),
+    .oitf_empty          (),
     .amo_wait            (amo_wait),
 
     .cmt_o_valid         (alu_cmt_valid      ),
@@ -550,22 +564,42 @@ module redundant_exu(
     .read_csr_dat        (read_csr_dat),
     .wbck_csr_dat        (wbck_csr_dat),
 
-    .agu_icb_cmd_valid   (agu_icb_cmd_valid ),
+
+    ///////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////
+    //.agu_icb_cmd_valid   (agu_icb_cmd_valid ),
     .agu_icb_cmd_ready   (agu_icb_cmd_ready ),
-    .agu_icb_cmd_addr    (agu_icb_cmd_addr ),
-    .agu_icb_cmd_read    (agu_icb_cmd_read   ),
-    .agu_icb_cmd_wdata   (agu_icb_cmd_wdata ),
-    .agu_icb_cmd_wmask   (agu_icb_cmd_wmask ),
-    .agu_icb_cmd_lock    (agu_icb_cmd_lock),
-    .agu_icb_cmd_excl    (agu_icb_cmd_excl),
-    .agu_icb_cmd_size    (agu_icb_cmd_size),
+    //.agu_icb_cmd_addr    (agu_icb_cmd_addr ),
+    //.agu_icb_cmd_read    (agu_icb_cmd_read   ),
+    //.agu_icb_cmd_wdata   (agu_icb_cmd_wdata ),
+    //.agu_icb_cmd_wmask   (agu_icb_cmd_wmask ),
+    //.agu_icb_cmd_lock    (agu_icb_cmd_lock),
+    //.agu_icb_cmd_excl    (agu_icb_cmd_excl),
+    //.agu_icb_cmd_size    (agu_icb_cmd_size),
    
-    .agu_icb_cmd_back2agu(agu_icb_cmd_back2agu ),
-    .agu_icb_cmd_usign   (agu_icb_cmd_usign),
-    .agu_icb_cmd_itag    (agu_icb_cmd_itag),
+    //.agu_icb_cmd_back2agu(agu_icb_cmd_back2agu ),
+    //.agu_icb_cmd_usign   (agu_icb_cmd_usign),
+    //.agu_icb_cmd_itag    (agu_icb_cmd_itag),
+    
+    .agu_icb_cmd_valid   (),
+    //.agu_icb_cmd_ready   (agu_icb_cmd_ready ),
+    .agu_icb_cmd_addr    (),
+    .agu_icb_cmd_read    (),
+    .agu_icb_cmd_wdata   (),
+    .agu_icb_cmd_wmask   (),
+    .agu_icb_cmd_lock    (),
+    .agu_icb_cmd_excl    (),
+    .agu_icb_cmd_size    (),
+   
+    .agu_icb_cmd_back2agu(),
+    .agu_icb_cmd_usign   (),
+    .agu_icb_cmd_itag    (),
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
   
     .agu_icb_rsp_valid   (agu_icb_rsp_valid ),
-    .agu_icb_rsp_ready   (agu_icb_rsp_ready ),
+    //.agu_icb_rsp_ready   (agu_icb_rsp_ready ),
+    .agu_icb_rsp_ready   (),
     .agu_icb_rsp_err     (agu_icb_rsp_err   ),
     .agu_icb_rsp_excl_ok (agu_icb_rsp_excl_ok),
     .agu_icb_rsp_rdata   (agu_icb_rsp_rdata),
@@ -600,7 +634,8 @@ module redundant_exu(
   e203_exu_longpwbck u_e203_exu_longpwbck(
 
     .lsu_wbck_i_valid   (lsu_o_valid ),
-    .lsu_wbck_i_ready   (lsu_o_ready ),
+    //.lsu_wbck_i_ready   (lsu_o_ready ),
+    .lsu_wbck_i_ready   (),
     .lsu_wbck_i_wdat    (lsu_o_wbck_wdat  ),
     .lsu_wbck_i_itag    (lsu_o_wbck_itag  ),
     .lsu_wbck_i_err     (lsu_o_wbck_err   ),
@@ -629,7 +664,8 @@ module redundant_exu(
     .oitf_ret_rdwen      (oitf_ret_rdwen),
     .oitf_ret_rdfpu      (oitf_ret_rdfpu),
     .oitf_ret_pc         (oitf_ret_pc),
-    .oitf_empty          (oitf_empty    ),
+    //.oitf_empty          (oitf_empty    ),
+    .oitf_empty          (),
     .oitf_ret_ptr        (oitf_ret_ptr  ),
     .oitf_ret_ena        (oitf_ret_ena  ),
     
@@ -696,18 +732,23 @@ module redundant_exu(
 
 
   e203_exu_commit u_e203_exu_commit(
-    .commit_mret         (commit_mret),
-    .commit_trap         (commit_trap),
-    .core_wfi            (core_wfi        ),
+    //.commit_mret         (commit_mret),
+    .commit_mret         (),
+    //.commit_trap         (commit_trap),
+    .commit_trap         (),
+    //.core_wfi            (core_wfi        ),
+    .core_wfi            (),
     .nonflush_cmt_ena    (nonflush_cmt_ena),
 
-    .excp_active         (excp_active),
+    //.excp_active         (excp_active),
+     .excp_active         (),
 
     .amo_wait            (amo_wait     ),
 
     .wfi_halt_exu_req    (wfi_halt_exu_req),
     .wfi_halt_exu_ack    (wfi_halt_exu_ack),
-    .wfi_halt_ifu_req    (wfi_halt_ifu_req),
+    //.wfi_halt_ifu_req    (wfi_halt_ifu_req),
+    .wfi_halt_ifu_req    (),
     .wfi_halt_ifu_ack    (wfi_halt_ifu_ack),
 
     .dbg_irq_r               (dbg_irq_r),
@@ -763,7 +804,8 @@ module redundant_exu(
     .dbg_ebreakm_r         (dbg_ebreakm_r),
 
 
-    .oitf_empty            (oitf_empty),
+    //.oitf_empty            (oitf_empty),
+    .oitf_empty            (),
     .u_mode                (u_mode),
     .s_mode                (s_mode),
     .h_mode                (h_mode),
@@ -778,10 +820,14 @@ module redundant_exu(
     .cmt_instret_ena       (cmt_instret_ena  ),
     .cmt_status_ena        (cmt_status_ena  ),
                            
-    .cmt_dpc               (cmt_dpc        ),
-    .cmt_dpc_ena           (cmt_dpc_ena    ),
-    .cmt_dcause            (cmt_dcause     ),
-    .cmt_dcause_ena        (cmt_dcause_ena ),
+//    .cmt_dpc               (cmt_dpc        ),
+//    .cmt_dpc_ena           (cmt_dpc_ena    ),
+//    .cmt_dcause            (cmt_dcause     ),
+//    .cmt_dcause_ena        (cmt_dcause_ena ),
+    .cmt_dpc               (),
+    .cmt_dpc_ena           (),
+    .cmt_dcause            (),
+    .cmt_dcause_ena        (),
 
     .cmt_mret_ena            (cmt_mret_ena     ),
     .csr_epc_r               (csr_epc_r       ),
@@ -792,11 +838,15 @@ module redundant_exu(
     .flush_req           (flush_req      ),
 
     .pipe_flush_ack          (pipe_flush_ack    ),
-    .pipe_flush_req          (pipe_flush_req    ),
-    .pipe_flush_add_op1      (pipe_flush_add_op1),  
-    .pipe_flush_add_op2      (pipe_flush_add_op2),  
+    //.pipe_flush_req          (pipe_flush_req    ),
+    .pipe_flush_req          (),
+    //.pipe_flush_add_op1      (pipe_flush_add_op1),
+    .pipe_flush_add_op1      (),  
+    //.pipe_flush_add_op2      (pipe_flush_add_op2),  
+    .pipe_flush_add_op2      (),
   `ifdef E203_TIMING_BOOST//}
-    .pipe_flush_pc           (pipe_flush_pc),  
+    //.pipe_flush_pc           (pipe_flush_pc),
+    .pipe_flush_pc           (),  
   `endif//}
 
     .clk                     (clk          ),
@@ -807,10 +857,10 @@ module redundant_exu(
     // The Decode to IFU read-en used for the branch dependency check
     //   only need to check the integer regfile, so here we need to exclude
     //   the FPU condition out
-  assign dec2ifu_rden  = disp_oitf_rdwen & (~disp_oitf_rdfpu); 
-  assign dec2ifu_rs1en = disp_oitf_rs1en & (~disp_oitf_rs1fpu);
-  assign dec2ifu_rdidx = dec_rdidx;
-  assign rf2ifu_rs1    = rf_rs1;
+//  assign dec2ifu_rden  = disp_oitf_rdwen & (~disp_oitf_rdfpu); 
+//  assign dec2ifu_rs1en = disp_oitf_rs1en & (~disp_oitf_rs1fpu);
+//  assign dec2ifu_rdidx = dec_rdidx;
+//  assign rf2ifu_rs1    = rf_rs1;
 
 
 
@@ -819,11 +869,15 @@ module redundant_exu(
     .csr_access_ilgl     (csr_access_ilgl),
     .eai_xs_off          (eai_xs_off),
     .nonflush_cmt_ena    (nonflush_cmt_ena),
-    .tm_stop             (tm_stop),
-    .itcm_nohold         (itcm_nohold),
+    //.tm_stop             (tm_stop),
+    .tm_stop             (),
+    //.itcm_nohold         (itcm_nohold),
+    .itcm_nohold         (),
     .mdv_nob2b           (mdv_nob2b),
-    .core_cgstop         (core_cgstop),
-    .tcm_cgstop          (tcm_cgstop ),
+    //.core_cgstop         (core_cgstop),
+    .core_cgstop         (),
+    //.tcm_cgstop          (tcm_cgstop ),
+    .tcm_cgstop          (),
     .csr_ena             (csr_ena),
     .csr_idx             (csr_idx),
     .csr_rd_en           (csr_rd_en),
@@ -845,12 +899,17 @@ module redundant_exu(
     .csr_dpc_r     (csr_dpc_r       ),
     .csr_mtvec_r   (csr_mtvec_r     ),
 
-    .wr_dcsr_ena     (wr_dcsr_ena    ),
-    .wr_dpc_ena      (wr_dpc_ena     ),
-    .wr_dscratch_ena (wr_dscratch_ena),
+//    .wr_dcsr_ena     (wr_dcsr_ena    ),
+//    .wr_dpc_ena      (wr_dpc_ena     ),
+//    .wr_dscratch_ena (wr_dscratch_ena),
+    .wr_dcsr_ena     (),
+    .wr_dpc_ena      (),
+    .wr_dscratch_ena (),
+
 
                                      
-    .wr_csr_nxt      (wr_csr_nxt    ),
+    //.wr_csr_nxt      (wr_csr_nxt    ),
+    .wr_csr_nxt      (),
                                      
     .dcsr_r          (dcsr_r         ),
     .dpc_r           (dpc_r          ),
@@ -880,7 +939,7 @@ module redundant_exu(
     .rst_n         (rst_n        ) 
   );
 
-  assign exu_active = (~oitf_empty) | i_valid | excp_active;
+  //assign exu_active = (~oitf_empty) | i_valid | excp_active;
 
 
 endmodule                                      
