@@ -396,6 +396,126 @@ module new_core(
     .clk                    (clk_core_ifu  ),
     .rst_n                  (rst_n         ) 
   );
+  
+  
+  /////////////////////////////////////////////////////////////
+  //implent the ifu buffer
+  wire [`E203_PC_SIZE-1:0] bufout_inspect_pc;
+  wire bufout_ifu_active;
+
+  `ifdef E203_HAS_ITCM //{
+  wire bufout_ifu2itcm_icb_cmd_valid; // Handshake valid
+  wire [`E203_ITCM_ADDR_WIDTH-1:0]   bufout_ifu2itcm_icb_cmd_addr; // Bus transaction start addr 
+  wire bufout_ifu2itcm_icb_rsp_ready; // Response ready
+  `endif//}
+
+  `ifdef E203_HAS_MEM_ITF //{
+  wire bufout_ifu2biu_icb_cmd_valid; // Handshake valid
+  wire [`E203_ADDR_SIZE-1:0]   bufout_ifu2biu_icb_cmd_addr; // Bus transaction start addr 
+  wire bufout_ifu2biu_icb_rsp_ready; // Response ready
+
+  `endif//}
+  wire [`E203_INSTR_SIZE-1:0] bufout_ifu_o_ir;// The instruction register
+  wire [`E203_PC_SIZE-1:0] bufout_ifu_o_pc;   // The PC register along with
+  wire bufout_ifu_o_pc_vld;
+  wire bufout_ifu_o_misalgn;                  // The fetch misalign 
+  wire bufout_ifu_o_buserr;                   // The fetch bus error
+  wire [`E203_RFIDX_WIDTH-1:0] bufout_ifu_o_rs1idx;
+  wire [`E203_RFIDX_WIDTH-1:0] bufout_ifu_o_rs2idx;
+  wire bufout_ifu_o_prdt_taken;               // The Bxx is predicted as taken
+  wire bufout_ifu_o_muldiv_b2b;               
+  wire bufout_ifu_o_valid; // Handshake signals with EXU stage
+  wire bufout_pipe_flush_ack;
+  `ifdef E203_TIMING_BOOST//}
+  `endif//}
+
+  wire  bufout_ifu_halt_ack;
+  
+  //////////////////////////////////////
+   wire ifu_buffer_enable; 
+   /////////////////////////////////////
+  
+  ifu_buffer u_ifu_buffer(
+  
+    .clk(clk_core_ifu),
+    .lden(ifu_buffer_enable),  
+  
+  
+/////////////////////////////////////////////////////////////////////////////////
+//output  
+      .inspect_pc(bufout_inspect_pc),
+      .ifu_active(bufout_ifu_active),
+
+  `ifdef E203_HAS_ITCM //{
+      .ifu2itcm_icb_cmd_valid(bufout_ifu2itcm_icb_cmd_valid), // Handshake valid
+      .ifu2itcm_icb_cmd_addr(bufout_ifu2itcm_icb_cmd_addr), // Bus transaction start addr 
+      .ifu2itcm_icb_rsp_ready(bufout_ifu2biu_icb_rsp_ready), // Response ready
+  `endif//}
+
+  `ifdef E203_HAS_MEM_ITF //{
+      .ifu2biu_icb_cmd_valid(bufout_ifu2biu_icb_cmd_valid), // Handshake valid
+      .ifu2biu_icb_cmd_addr(bufout_ifu2biu_icb_cmd_addr), // Bus transaction start addr 
+      .ifu2biu_icb_rsp_ready(bufout_ifu2biu_icb_rsp_ready), // Response ready
+
+  `endif//}
+      .ifu_o_ir(bufout_ifu_o_ir),// The instruction register
+      .ifu_o_pc(bufout_ifu_o_pc),   // The PC register along with
+      .ifu_o_pc_vld(bufout_ifu_o_pc_vld),
+      .ifu_o_misalgn(bufout_ifu_o_misalgn),                  // The fetch misalign 
+      .ifu_o_buserr(bufout_ifu_o_buserr),                   // The fetch bus error
+      .ifu_o_rs1idx(bufout_ifu_o_rs1idx),
+      .ifu_o_rs2idx(bufout_ifu_o_rs2idx),
+      .ifu_o_prdt_taken(bufout_ifu_o_prdt_taken),               // The Bxx is predicted as taken
+      .ifu_o_muldiv_b2b(bufout_ifu_o_muldiv_b2b),               
+      .ifu_o_valid(bufout_ifu_o_valid), // Handshake signals with EXU stage
+      .pipe_flush_ack(bufout_pipe_flush_ack),
+  `ifdef E203_TIMING_BOOST//}
+  `endif//}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//input  
+      .in_inspect_pc(inspect_pc),
+      .in_ifu_active(ifu_active),
+
+  `ifdef E203_HAS_ITCM //{
+      .in_ifu2itcm_icb_cmd_valid(ifu2itcm_icb_cmd_valid), // Handshake valid
+      .in_ifu2itcm_icb_cmd_addr(ifu2itcm_icb_cmd_addr), // Bus transaction start addr 
+      .in_ifu2itcm_icb_rsp_ready(ifu2biu_icb_rsp_ready), // Response ready
+  `endif//}
+
+  `ifdef E203_HAS_MEM_ITF //{
+      .in_ifu2biu_icb_cmd_valid(ifu2biu_icb_cmd_valid), // Handshake valid
+      .in_ifu2biu_icb_cmd_addr(ifu2biu_icb_cmd_addr), // Bus transaction start addr 
+      .in_ifu2biu_icb_rsp_ready(ifu2biu_icb_rsp_ready), // Response ready
+
+  `endif//}
+      .in_ifu_o_ir(ifu_o_ir),// The instruction register
+      .in_ifu_o_pc(ifu_o_pc),   // The PC register along with
+      .in_ifu_o_pc_vld(ifu_o_pc_vld),
+      .in_ifu_o_misalgn(ifu_o_misalgn),                  // The fetch misalign 
+      .in_ifu_o_buserr(ifu_o_buserr),                   // The fetch bus error
+      .in_ifu_o_rs1idx(ifu_o_rs1idx),
+      .in_ifu_o_rs2idx(ifu_o_rs2idx),
+      .in_ifu_o_prdt_taken(ifu_o_prdt_taken),               // The Bxx is predicted as taken
+      .in_ifu_o_muldiv_b2b(ifu_o_muldiv_b2b),               
+      .in_ifu_o_valid(ifu_o_valid), // Handshake signals with EXU stage
+      .in_pipe_flush_ack(pipe_flush_ack)
+  `ifdef E203_TIMING_BOOST//}
+  `endif//}  
+
+  );
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   
 
