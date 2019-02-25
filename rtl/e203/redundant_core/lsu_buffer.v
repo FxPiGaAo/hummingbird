@@ -8,7 +8,8 @@
 `include "e203_defines.v"
 
 module lsu_buffer(
-  input in_lsu_active,
+//we dont need lsu_active because it connects outside the core
+  //input in_lsu_active,
   input in_lsu_o_valid, // Handshake valid
   input [`E203_XLEN-1:0] in_lsu_o_wbck_wdat,
   input [`E203_ITAG_WIDTH -1:0] in_lsu_o_wbck_itag,

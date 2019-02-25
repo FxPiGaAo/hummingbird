@@ -399,7 +399,7 @@ module new_core(
   
   
   /////////////////////////////////////////////////////////////
-  //implent the ifu buffer
+  //implement the ifu buffer
   wire [`E203_PC_SIZE-1:0] bufout_inspect_pc;
   wire bufout_ifu_active;
 
@@ -940,6 +940,56 @@ module new_core(
 
     .clk                    (clk_core_biu ),
     .rst_n                  (rst_n        ) 
+  );
+  
+  /////////////////////////////////////////////////////////////////////////////////////////
+  //implement the lsu buffer
+  wire bufout_lsu_o_valid; // Handshake valid
+  wire [`E203_XLEN-1:0] bufout_lsu_o_wbck_wdat;
+  wire [`E203_ITAG_WIDTH -1:0] bufout_lsu_o_wbck_itag;
+  wire bufout_lsu_o_wbck_err; 
+  wire  bufout_lsu_o_cmt_ld;
+  wire  bufout_lsu_o_cmt_st;
+  wire  [`E203_ADDR_SIZE -1:0] bufout_lsu_o_cmt_badaddr;
+  wire  bufout_lsu_o_cmt_buserr; // The bus-error exception generated
+  
+    //////////////////////////////////////
+   wire lsu_buffer_enable; 
+   /////////////////////////////////////
+
+
+  lsu_buffer u_lsu_buffer(
+  
+   .clk(clk_core_ifu),
+   .lden(lsu_buffer_enable),  
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  //input
+  //.in_lsu_active(lsu_active),
+  //we dont need lsu_active because it connects outside the core
+  .in_lsu_o_valid(lsu_o_valid), // Handshake valid
+  .in_lsu_o_wbck_wdat(lsu_o_wbck_wdat),
+  .in_lsu_o_wbck_itag(lsu_o_wbck_itag),
+  .in_lsu_o_wbck_err(lsu_o_wbck_err), 
+  .in_lsu_o_cmt_ld(lsu_o_cmt_ld),
+  .in_lsu_o_cmt_st(lsu_o_cmt_st),
+  .in_lsu_o_cmt_badaddr(lsu_o_cmt_badaddr),
+  .in_lsu_o_cmt_buserr(lsu_o_cmt_buserr) , // The bus-error exception generated
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  //output
+  //.in_lsu_active(lsu_active),
+  //we dont need lsu_active because it connects outside the core
+  .lsu_o_valid(bufout_lsu_o_valid), // Handshake valid
+  .lsu_o_wbck_wdat(bufout_lsu_o_wbck_wdat),
+  .lsu_o_wbck_itag(bufout_lsu_o_wbck_itag),
+  .lsu_o_wbck_err(bufout_lsu_o_wbck_err), 
+  .lsu_o_cmt_ld(bufout_lsu_o_cmt_ld),
+  .lsu_o_cmt_st(bufout_lsu_o_cmt_st),
+  .lsu_o_cmt_badaddr(bufout_lsu_o_cmt_badaddr),
+  .lsu_o_cmt_buserr(bufout_lsu_o_cmt_buserr) // The bus-error exception generated
+
   );
 
 
