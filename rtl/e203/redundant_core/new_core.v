@@ -471,6 +471,7 @@ module new_core(
       .pipe_flush_ack(bufout_pipe_flush_ack),
   `ifdef E203_TIMING_BOOST//}
   `endif//}
+       .ifu_halt_ack(bufout_ifu_halt_ack),
 
 
 
@@ -501,9 +502,10 @@ module new_core(
       .in_ifu_o_prdt_taken(ifu_o_prdt_taken),               // The Bxx is predicted as taken
       .in_ifu_o_muldiv_b2b(ifu_o_muldiv_b2b),               
       .in_ifu_o_valid(ifu_o_valid), // Handshake signals with EXU stage
-      .in_pipe_flush_ack(pipe_flush_ack)
+      .in_pipe_flush_ack(pipe_flush_ack),
   `ifdef E203_TIMING_BOOST//}
-  `endif//}  
+  `endif//}
+       .in_ifu_halt_ack(wfi_halt_ifu_ack)  
 
   );
   
@@ -948,10 +950,16 @@ module new_core(
   wire [`E203_XLEN-1:0] bufout_lsu_o_wbck_wdat;
   wire [`E203_ITAG_WIDTH -1:0] bufout_lsu_o_wbck_itag;
   wire bufout_lsu_o_wbck_err; 
-  wire  bufout_lsu_o_cmt_ld;
-  wire  bufout_lsu_o_cmt_st;
-  wire  [`E203_ADDR_SIZE -1:0] bufout_lsu_o_cmt_badaddr;
-  wire  bufout_lsu_o_cmt_buserr; // The bus-error exception generated
+  wire bufout_lsu_o_cmt_ld;
+  wire bufout_lsu_o_cmt_st;
+  wire [`E203_ADDR_SIZE -1:0] bufout_lsu_o_cmt_badaddr;
+  wire bufout_lsu_o_cmt_buserr; // The bus-error exception generated
+  wire bufout_agu_icb_cmd_ready; // Handshake ready
+  wire bufout_agu_icb_rsp_valid; // Response valid 
+  wire bufout_agu_icb_rsp_err; // Response error
+  wire bufout_agu_icb_rsp_excl_ok; // Response error
+  wire [`E203_XLEN-1:0]  bufout_agu_icb_rsp_rdata;
+
   
     //////////////////////////////////////
    wire lsu_buffer_enable; 
@@ -960,7 +968,7 @@ module new_core(
 
   lsu_buffer u_lsu_buffer(
   
-   .clk(clk_core_ifu),
+   .clk(clk_core_lsu),
    .lden(lsu_buffer_enable),  
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -974,7 +982,13 @@ module new_core(
   .in_lsu_o_cmt_ld(lsu_o_cmt_ld),
   .in_lsu_o_cmt_st(lsu_o_cmt_st),
   .in_lsu_o_cmt_badaddr(lsu_o_cmt_badaddr),
-  .in_lsu_o_cmt_buserr(lsu_o_cmt_buserr) , // The bus-error exception generated
+  .in_lsu_o_cmt_buserr(lsu_o_cmt_buserr), // The bus-error exception generated
+  .in_agu_icb_cmd_ready(agu_icb_cmd_ready), // Handshake ready
+  .in_agu_icb_rsp_valid(agu_icb_rsp_valid), // Response valid 
+  .in_agu_icb_rsp_err(agu_icb_rsp_err), // Response error
+  .in_agu_icb_rsp_excl_ok(agu_icb_rsp_excl_ok), // Response error
+  .in_agu_icb_rsp_rdata(agu_icb_rsp_rdata),
+
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -988,8 +1002,173 @@ module new_core(
   .lsu_o_cmt_ld(bufout_lsu_o_cmt_ld),
   .lsu_o_cmt_st(bufout_lsu_o_cmt_st),
   .lsu_o_cmt_badaddr(bufout_lsu_o_cmt_badaddr),
-  .lsu_o_cmt_buserr(bufout_lsu_o_cmt_buserr) // The bus-error exception generated
+  .lsu_o_cmt_buserr(bufout_lsu_o_cmt_buserr), // The bus-error exception generated
+  .agu_icb_cmd_ready(bufout_agu_icb_cmd_ready), // Handshake ready
+  .agu_icb_rsp_valid(bufout_agu_icb_rsp_valid), // Response valid 
+  .agu_icb_rsp_err(bufout_agu_icb_rsp_err), // Response error
+  .agu_icb_rsp_excl_ok(bufout_agu_icb_rsp_excl_ok), // Response error
+  .agu_icb_rsp_rdata(bufout_agu_icb_rsp_rdata)
 
+  );
+  
+  
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  //implement the redundant core
+  redundant_exu u_redundant_exu(
+//  output commit_mret,
+//  output commit_trap,
+//  output exu_active,
+//  output excp_active,
+
+//  output core_wfi,
+//  output tm_stop,
+//  output itcm_nohold,
+//  output core_cgstop,
+//  output tcm_cgstop,
+
+
+//Values dont change during the running process
+  .core_mhartid(core_mhartid),
+  .dbg_irq_r(dbg_irq_r),
+  .lcl_irq_r(lcl_irq_r),
+  .evt_r(evt_r),
+  .ext_irq_r(ext_irq_r),
+  .sft_irq_r(sft_irq_r),
+  .tmr_irq_r(tmr_irq_r),
+
+//  //////////////////////////////////////////////////////////////
+//  // From/To debug ctrl module
+//  output  [`E203_PC_SIZE-1:0] cmt_dpc,
+//  output  cmt_dpc_ena,
+//  output  [3-1:0] cmt_dcause,
+//  output  cmt_dcause_ena,
+
+//  output wr_dcsr_ena    ,
+//  output wr_dpc_ena     ,
+//  output wr_dscratch_ena,
+
+
+
+  //output [`E203_XLEN-1:0] wr_csr_nxt    ,
+
+  .dcsr_r(dcsr_r)    ,
+  .dpc_r(dpc_r)     ,
+  .dscratch_r(dscratch_r),
+
+  .dbg_mode(dbg_mode),
+  .dbg_halt_r(dbg_halt_r),
+  .dbg_step_r(dbg_step_r),
+  .dbg_ebreakm_r(dbg_ebreakm_r),
+  .dbg_stopcycle(dbg_stopcycle),
+
+
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  // The IFU IR stage to EXU interface
+  .i_valid(bufout_ifu_o_valid), // Handshake signals with EXU stage
+  //output i_ready,
+  .i_ir(bufout_ifu_o_ir),// The instruction register
+  .i_pc(bufout_ifu_o_pc),   // The PC register along with
+  .i_pc_vld(bufout_ifu_o_pc_vld),
+  .i_misalgn(bufout_ifu_o_misalgn),              // The fetch misalign
+  .i_buserr(bufout_ifu_o_buserr),               // The fetch bus error
+  .i_prdt_taken(bufout_ifu_o_prdt_taken),               
+  .i_muldiv_b2b(bufout_ifu_o_muldiv_b2b),               
+  .i_rs1idx(bufout_ifu_o_rs1idx),   // The RS1 index
+  .i_rs2idx(bufout_ifu_o_rs2idx),   // The RS2 index
+
+
+
+  //////////////////////////////////////////////////////////////
+  // The Flush interface to IFU
+  //
+  //   To save the gatecount, when we need to flush pipeline with new PC, 
+  //     we want to reuse the adder in IFU, so we will not pass flush-PC
+  //     to IFU, instead, we pass the flush-pc-adder-op1/op2 to IFU
+  //     and IFU will just use its adder to caculate the flush-pc-adder-result
+  //
+  .pipe_flush_ack(bufout_pipe_flush_ack),
+//  output  pipe_flush_req,
+//  output  [`E203_PC_SIZE-1:0] pipe_flush_add_op1,  
+//  output  [`E203_PC_SIZE-1:0] pipe_flush_add_op2,  
+//  `ifdef E203_TIMING_BOOST//}
+//  output  [`E203_PC_SIZE-1:0] pipe_flush_pc,  
+//  `endif//}
+
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  // The LSU Write-Back Interface
+  .lsu_o_valid(bufout_lsu_o_valid), // Handshake valid
+  //output lsu_o_ready, // Handshake ready
+  .lsu_o_wbck_wdat(bufout_lsu_o_wbck_wdat),
+  .lsu_o_wbck_itag(bufout_lsu_o_wbck_itag),
+  .lsu_o_wbck_err(bufout_lsu_o_wbck_err) , 
+  .lsu_o_cmt_ld(bufout_lsu_o_cmt_ld),
+  .lsu_o_cmt_st(bufout_lsu_o_cmt_st),
+  .lsu_o_cmt_badaddr(bufout_lsu_o_cmt_badaddr),
+  .lsu_o_cmt_buserr(bufout_lsu_o_cmt_buserr) , // The bus-error exception generated
+
+  //output wfi_halt_ifu_req,
+  .wfi_halt_ifu_ack(bufout_ifu_halt_ack),
+
+//  output oitf_empty,
+//  output [`E203_XLEN-1:0] rf2ifu_x1,
+//  output [`E203_XLEN-1:0] rf2ifu_rs1,
+//  output dec2ifu_rden,
+//  output dec2ifu_rs1en,
+//  output [`E203_RFIDX_WIDTH-1:0] dec2ifu_rdidx,
+//  output dec2ifu_mulhsu,
+//  output dec2ifu_div   ,
+//  output dec2ifu_rem   ,
+//  output dec2ifu_divu  ,
+//  output dec2ifu_remu  ,
+
+  //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  // The AGU ICB Interface to LSU-ctrl
+  //    * Bus cmd channel
+  //output                         agu_icb_cmd_valid, // Handshake valid
+  .agu_icb_cmd_ready(bufout_agu_icb_cmd_ready), // Handshake ready
+  //output [`E203_ADDR_SIZE-1:0]   agu_icb_cmd_addr, // Bus transaction start addr 
+  //output                         agu_icb_cmd_read,   // Read or write
+  //output [`E203_XLEN-1:0]        agu_icb_cmd_wdata, 
+  //output [`E203_XLEN/8-1:0]      agu_icb_cmd_wmask, 
+  //output                         agu_icb_cmd_lock,
+  //output                         agu_icb_cmd_excl,
+  //output [1:0]                   agu_icb_cmd_size,
+           // Several additional side channel signals
+           //   Indicate LSU-ctrl module to
+           //     return the ICB response channel back to AGU
+           //     this is only used by AMO or unaligned load/store 1st uop
+           //     to return the response
+  //output                         agu_icb_cmd_back2agu, 
+           //   Sign extension or not
+  //output                         agu_icb_cmd_usign,
+  //output [`E203_ITAG_WIDTH -1:0] agu_icb_cmd_itag,
+
+  //    * Bus RSP channel
+  .agu_icb_rsp_valid(bufout_agu_icb_rsp_valid),// Response valid 
+  //output                         agu_icb_rsp_ready, // Response ready
+  .agu_icb_rsp_err(bufout_agu_icb_rsp_err), // Response error
+  .agu_icb_rsp_excl_ok(bufout_agu_icb_rsp_excl_ok),
+  .agu_icb_rsp_rdata(bufout_agu_icb_rsp_rdata),
+
+  `ifdef E203_HAS_CSR_EAI//{
+  //output         eai_csr_valid,
+  .eai_csr_ready(eai_csr_ready),
+  //output  [31:0] eai_csr_addr,
+  //output         eai_csr_wr,
+  //output  [31:0] eai_csr_wdata,
+  .eai_csr_rdata(eai_csr_rdata),
+  `endif//}
+
+
+
+
+  .test_mode(test_mode),
+  .clk_aon(clk_aon),
+  .clk(clk_core_exu),
+  .rst_n(rst_n)
   );
 
 

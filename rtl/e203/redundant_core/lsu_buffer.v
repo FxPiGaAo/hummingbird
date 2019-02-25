@@ -49,7 +49,8 @@ module lsu_buffer(
 //  // The AGU ICB Interface to LSU-ctrl
 //  //    * Bus cmd channel
 //  input                          agu_icb_cmd_valid, // Handshake valid
-//  output                         agu_icb_cmd_ready, // Handshake ready
+    input                           in_agu_icb_cmd_ready, // Handshake ready
+    output                         agu_icb_cmd_ready, // Handshake ready
 //  input  [`E203_ADDR_SIZE-1:0]   agu_icb_cmd_addr, // Bus transaction start addr 
 //  input                          agu_icb_cmd_read,   // Read or write
 //  input  [`E203_XLEN-1:0]        agu_icb_cmd_wdata, 
@@ -68,11 +69,19 @@ module lsu_buffer(
 //  input  [`E203_ITAG_WIDTH -1:0] agu_icb_cmd_itag,
 
 //  //    * Bus RSP channel
-//  output                         agu_icb_rsp_valid, // Response valid 
+    output                         agu_icb_rsp_valid, // Response valid 
 //  input                          agu_icb_rsp_ready, // Response ready
-//  output                         agu_icb_rsp_err  , // Response error
-//  output                         agu_icb_rsp_excl_ok, // Response error
-//  output [`E203_XLEN-1:0]        agu_icb_rsp_rdata,
+    output                         agu_icb_rsp_err  , // Response error
+    output                         agu_icb_rsp_excl_ok, // Response error
+    output [`E203_XLEN-1:0]        agu_icb_rsp_rdata,
+    
+ //  //    * Bus RSP channel
+    input                         in_agu_icb_rsp_valid, // Response valid 
+//  input                          agu_icb_rsp_ready, // Response ready
+    input                         in_agu_icb_rsp_err  , // Response error
+    input                         in_agu_icb_rsp_excl_ok, // Response error
+    input [`E203_XLEN-1:0]        in_agu_icb_rsp_rdata,
+   
 
 
   
@@ -174,7 +183,17 @@ module lsu_buffer(
   sirv_gnrl_dffl #(`E203_ADDR_SIZE)  lsu_o_cmt_badaddr_dffl (lden, in_lsu_o_cmt_badaddr, lsu_o_cmt_badaddr, clk);
   //output lsu_o_cmt_buserr , // The bus-error exception generated
   sirv_gnrl_dffl #(1)  lsu_o_cmt_buserr_dffl (lden, in_lsu_o_cmt_buserr, lsu_o_cmt_buserr, clk);
-  
+  //output                         agu_icb_cmd_ready, // Handshake ready
+  sirv_gnrl_dffl #(1)  agu_icb_cmd_ready_dffl (lden, in_agu_icb_cmd_ready, agu_icb_cmd_ready, clk);
+  //output                         agu_icb_rsp_valid, // Response valid
+  sirv_gnrl_dffl #(1)  agu_icb_rsp_valid_dffl (lden, in_agu_icb_rsp_valid, agu_icb_rsp_valid, clk); 
+  //output                         agu_icb_rsp_err  , // Response error
+  sirv_gnrl_dffl #(1)  agu_icb_rsp_err_dffl (lden, in_agu_icb_rsp_err, agu_icb_rsp_err, clk);
+  //output                         agu_icb_rsp_excl_ok, // Response error
+  sirv_gnrl_dffl #(1)  agu_icb_rsp_excl_ok_dffl (lden, in_agu_icb_rsp_excl_ok, agu_icb_rsp_excl_ok, clk);
+  //output [`E203_XLEN-1:0]        agu_icb_rsp_rdata,
+  sirv_gnrl_dffl #(`E203_XLEN)  agu_icb_rsp_rdata_dffl (lden, in_agu_icb_rsp_rdata, agu_icb_rsp_rdata, clk);
+ 
   
 //    `ifdef E203_HAS_DCACHE //{
 //  //////////////////////////////////////////////////////////////
